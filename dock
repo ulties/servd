@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+IMAGE="servd:latest"
+CONTAINER="servd"
+PORT="3333:3333"
+VOLUME="servd-storage:/app/storage"
+
+case "${1:-help}" in
+  build)
+    docker build -t "$IMAGE" .
+    ;;
+  up)
+    docker run -d --name "$CONTAINER" -p "$PORT" -v "$VOLUME" "$IMAGE"
+    ;;
+  down)
+    docker rm -f "$CONTAINER" 2>/dev/null || true
+    ;;
+  restart)
+    "$0" down
+    "$0" up
+    ;;
+  rebuild)
+    "$0" down
+    "$0" build
+    "$0" up
+    ;;
+  clean)
+    "$0" down
+    docker rmi "$IMAGE" 2>/dev/null || true
+    docker volume rm servd-storage 2>/dev/null || true
+    ;;
+  logs)
+    docker logs -f "$CONTAINER"
+    ;;
+  shell)
+    docker exec -it "$CONTAINER" sh
+    ;;
+  status)
+    docker ps -a --filter "name=^${CONTAINER}$"
+    ;;
+  *)
+    echo "Usage: ./dock {build|up|down|restart|rebuild|clean|logs|shell|status}"
+    exit 1
+    ;;
+esac

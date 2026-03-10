@@ -1,0 +1,14 @@
+node_modules
+build
+tmp
+.git
+.gitignore
+.env
+.env.*
+.DS_Store
+.fleet
+.idea
+.vscode
+npm-debug.log
+yarn-error.log
+storage/*.sqlite3
